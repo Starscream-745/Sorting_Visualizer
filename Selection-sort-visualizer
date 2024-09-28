@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selection Sort Visualizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: #3498db;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .card {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: large;
+        }
+        .visualization, .performance-analysis {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .array-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 200px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        .array-block {
+            width: 40px;
+            margin: 0 2px;
+            background-color: #3498db;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border-radius: 5px 5px 0 0;
+        }
+        .comparing { background-color: #f1c40f; }
+        .min { background-color: #e74c3c; }
+        .sorted { background-color: #2ecc71; }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover { background-color: #2980b9; }
+        .btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        #speedSlider { width: 100%; max-width: 300px; }
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+        }
+        .code-container { margin-top: 20px; }
+        .code-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .language-btn {
+            padding: 5px 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .language-btn:hover, .language-btn.active { background-color: #2980b9; }
+        #currentLanguage {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        #arrayInput {
+            flex-grow: 1;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-width: 200px;
+        }
+        .performance-metrics {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .metric {
+            text-align: center;
+            margin: 10px;
+            flex: 1;
+            min-width: 120px;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .analysis-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .performance-analysis, .ai-question {
+            flex: 1;
+            min-width: 300px;
+        }
+        .ai-question {
+            background-color: #e8f4f8;
+            border-left: 5px solid #3498db;
+            padding: 10px;
+        }
+        .concept-content {
+            max-height: 100px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .concept-content.expanded {
+            max-height: 1000px;
+        }
+        .read-more {
+            color: #3498db;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .question-options {
+            display: grid;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .question-option {
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .question-option:hover {
+            background-color: #e0e0e0;
+        }
+        .question-option.selected {
+            background-color: #3498db;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .array-block { width: 30px; font-size: 12px; }
+            .controls { flex-direction: column; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+  <script src="https://cdn.botpress.cloud/webchat/v2/inject.js"></script>
+  <script src="https://mediafiles.botpress.cloud/52345432-5432543-5435-435545434/webchat/v2/config.js"></script>
+
+    <div class="header">
+        <h1><strong>Selection Sort</strong></h1>
+    </div>
+
+    <div class="card">
+        <h2>Algorithm Aim</h2>
+        <p><strong>Selection Sort is a comparison-based sorting algorithm. It sorts an array by repeatedly selecting the smallest (or largest) element from the unsorted portion and swapping it with the first unsorted element. This process continues until the entire array is sorted.</strong></p>
+    </div>
+
+    <div class="card">
+        <h2>Algorithm Concept</h2>
+        <div class="concept-content">
+            <p><strong>Steps of the Selection Sort Algorithm:</strong></p>
+            <p><strong>1. Start with the first element (index 0)</strong>:</p>
+            <p> - Consider the first element of the array as the minimum.</p>
+            <p> - Compare this element with every other element in the unsorted part of the list.</p>
+            <p><strong>2. Find the smallest element:</strong></p>
+            <p> - As you compare, keep track of the smallest element you find.</p>
+            <p> - After checking all elements in the unsorted part, the smallest element is identified.</p>
+            <p><strong>3. Swap if necessary:</strong></p>
+            <p> - If the smallest element is not the element you started with, swap the smallest element with the first unsorted element.</p>
+            <p><strong>4. Move to the next element (index 1):</strong></p>
+            <p> - Now consider the second element as the minimum and repeat the process for the remaining unsorted elements.</p>
+            <p><strong>5. Repeat the process:</strong></p>
+            <p> - Repeating these steps, each time shrinking the unsorted portion of the list until you reach the last element.</p>
+        </div>
+        <span class="read-more">Read More</span>
+    </div>
+
+    <div class="card">
+        <h2>Pseudo Code (C-style)</h2>
+        <pre id="pseudoCode">
+void selectionSort(int arr[], int n) {
+    int i, j, min_idx;
+    for (i = 0; i < n - 1; i++) {
+        min_idx = i;
+        for (j = i + 1; j < n; j++) {
+            if (arr[j] < arr[min_idx])
+                min_idx = j;
+        }
+        if (min_idx != i)
+            swap(&arr[min_idx], &arr[i]);
+    }
+}
+        </pre>
+    </div>
+
+    <div class="visualization">
+        <h2>Visualization</h2>
+        <div class="input-container">
+            <input type="text" id="arrayInput" placeholder="Enter numbers separated by commas" aria-label="Enter numbers separated by commas">
+            <button class="btn" id="setArrayBtn">Set Array</button>
+        </div>
+        <div class="array-container" id="arrayContainer" aria-live="polite"></div>
+        <div id="observations" aria-live="polite">
+            <p>Current step: 0</p>
+            <p>No operation in this step</p>
+        </div>
+        <div>
+            <label for="speedSlider">Speed: Slow</label>
+            <input type="range" id="speedSlider" min="1" max="100" value="50">
+            <span>Fast</span>
+        </div>
+        <div class="controls">
+            <button class="btn" id="prevBtn">⬅️ Previous Step</button>
+            <button class="btn" id="playPauseBtn">▶️ Play</button>
+            <button class="btn" id="nextBtn">Next Step ➡️</button>
+        </div>
+        <div class="controls">
+            <button class="btn" id="startBtn">Start</button>
+            <button class="btn" id="resetBtn">🔄 Reset</button>
+        </div>
+    </div>
+
+    <div class="analysis-container">
+        <div class="performance-analysis">
+            <h2>Performance Analysis</h2>
+            <div class="performance-metrics">
+                <div class="metric">
+                    <div class="metric-value" id="comparisons">0</div>
+                    <div>Comparisons</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="swaps">0</div>
+                    <div>Swaps</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">O(n²)</div>
+                    <div>Time Complexity</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">O(1)</div>
+                    <div>Space Complexity</div>
+                </div>
+            </div>
+            <div id="performanceExplanation"></div>
+        </div>
+
+        <div class="ai-question">
+            <h2>AI-Generated Question</h2>
+            <div id="aiQuestion"></div>
+            <div id="questionOptions" class="question-options"></div>
+            <button id="submitAnswer" class="btn" style="display: none;">Submit Answer</button>
+        </div>
+    </div>
+
+    <div class="code-container">
+        <h2>Implementation</h2>
+        <div class="code-buttons">
+            <button class="language-btn" onclick="showCode('c')">C</button>
+            <button class="language-btn" onclick="showCode('cpp')">C++</button>
+            <button class="language-btn" onclick="showCode('java')">Java</button>
+            <button class="language-btn" onclick="showCode('python')">Python</button>
+        </div>
+        <div id="currentLanguage">Current Language: C</div>
+        <pre id="codeImplementation"></pre>
+    </div>
+
+    <script>
+        const arrayContainer = document.getElementById('arrayContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const speedSlider = document.getElementById('speedSlider');
+        const observations = document.getElementById('observations');
+        const codeImplementation = document.getElementById('codeImplementation');
+        const currentLanguage = document.getElementById('currentLanguage');
+        const arrayInput = document.getElementById('arrayInput');
+        const setArrayBtn = document.getElementById('setArrayBtn');
+        const comparisonsElement = document.getElementById('comparisons');
+        const swapsElement = document.getElementById('swaps');
+        const performanceExplanation = document.getElementById('performanceExplanation');
+        const aiQuestionElement = document.getElementById('aiQuestion');
+        const questionOptionsElement = document.getElementById('questionOptions');
+        const submitAnswerBtn = document.getElementById('submitAnswer');
+        const readMoreBtn = document.querySelector('.read-more');
+        const conceptContent = document.querySelector('.concept-content');
+
+        let array = [64, 34, 25, 12, 22, 11, 90];
+        let sortingSteps = [];
+        let currentStep = 0;
+        let isPlaying = false;
+        let playInterval;
+        let comparisons = 0;
+        let swaps = 0;
+        let currentQuestion = null;
+
+        function generateArray() {
+            arrayContainer.innerHTML = '';
+            const maxHeight = 180;
+            const maxValue = Math.max(...array);
+            array.forEach((value, index) => {
+                const block = document.createElement('div');
+                block.className = 'array-block';
+                block.style.height = `${(value / maxValue) * maxHeight}px`;
+                block.textContent = value;
+                block.setAttribute('aria-label', `Element ${index + 1}: ${value}`);
+                arrayContainer.appendChild(block);
+            });
+        }
+
+        function selectionSort() {
+            const arr = [...array];
+            const steps = [];
+            const n = arr.length;
+            comparisons = 0;
+            swaps = 0;
+
+            for (let i = 0; i < n - 1; i++) {
+                let min_idx = i;
+                steps.push({ array: [...arr], comparing: [i, min_idx], min: min_idx, sorted: [...Array(i).keys()], comparisons, swaps });
+
+                for (let j = i + 1; j < n; j++) {
+                    comparisons++;
+                    steps.push({ array: [...arr], comparing: [min_idx, j], min: min_idx, sorted: [...Array(i).keys()], comparisons, swaps });
+                    if (arr[j] < arr[min_idx]) {
+                        min_idx = j;
+                        steps.push({ array: [...arr], comparing: [min_idx, j], min: min_idx, sorted: [...Array(i).keys()], comparisons, swaps });
+                    }
+                }
+
+                if (min_idx !== i) {
+                    swaps++;
+                    [arr[i], arr[min_idx]] = [arr[min_idx], arr[i]];
+                    steps.push({ array: [...arr], comparing: [i, min_idx], min: i, sorted: [...Array(i).keys()], comparisons, swaps });
+                }
+
+                steps.push({ array: [...arr], comparing: [], min: -1, sorted: [...Array(i + 1).keys()], comparisons, swaps });
+            }
+
+            steps.push({ array: arr, comparing: [], min: -1, sorted: [...Array(n).keys()], comparisons, swaps });
+            return steps;
+        }
+
+        function visualizeStep() {
+            const step = sortingSteps[currentStep];
+            const blocks = arrayContainer.children;
+
+            for (let i = 0; i < blocks.length; i++) {
+                blocks[i].textContent = step.array[i];
+                blocks[i].style.height = `${(step.array[i] / Math.max(...step.array)) * 180}px`;
+                blocks[i].className = 'array-block';
+                blocks[i].setAttribute('aria-label', `Element ${i + 1}: ${step.array[i]}`);
+                if (step.sorted.includes(i)) {
+                    blocks[i].classList.add('sorted');
+                } else if (step.comparing.includes(i)) {
+                    blocks[i].classList.add('comparing');
+                }
+                if (i === step.min) {
+                    blocks[i].classList.add('min');
+                }
+            }
+
+            observations.innerHTML = `
+                <p>Current step: ${currentStep + 1}</p>
+                <p>${step.comparing.length === 2
+                    ? `Comparing ${step.array[step.comparing[0]]} and ${step.array[step.comparing[1]]}`
+                    : 'No comparison in this step'}</p>
+            `;
+
+            comparisonsElement.textContent = step.comparisons;
+            swapsElement.textContent = step.swaps;
+
+            prevBtn.disabled = currentStep === 0;
+            nextBtn.disabled = currentStep === sortingSteps.length - 1;
+
+            updatePerformanceExplanation();
+        }
+
+        function resetSort() {
+            currentStep = 0;
+            isPlaying = false;
+            clearInterval(playInterval);
+            playPauseBtn.textContent = '▶️ Play';
+            sortingSteps = selectionSort();
+            generateArray();
+            visualizeStep();
+            generateAIQuestion();
+        }
+
+        function playPauseVisualization() {
+            isPlaying = !isPlaying;
+            playPauseBtn.textContent = isPlaying ? '⏸️ Pause' : '▶️ Play';
+            if (isPlaying) {
+                playInterval = setInterval(() => {
+                    if (currentStep < sortingSteps.length - 1) {
+                        currentStep++;
+                        visualizeStep();
+                    } else {
+                        isPlaying = false;
+                        playPauseBtn.textContent = '▶️ Play';
+                        clearInterval(playInterval);
+                    }
+                }, 1000 - speedSlider.value * 10);
+            } else {
+                clearInterval(playInterval);
+            }
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 0) {
+                currentStep--;
+                visualizeStep();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < sortingSteps.length - 1) {
+                currentStep++;
+                visualizeStep();
+            }
+        });
+
+        playPauseBtn.addEventListener('click', playPauseVisualization);
+        startBtn.addEventListener('click', () => {
+            resetSort();
+            playPauseVisualization();
+        });
+        resetBtn.addEventListener('click', resetSort);
+
+        speedSlider.addEventListener('input', () => {
+            if (isPlaying) {
+                clearInterval(playInterval);
+                playPauseVisualization();
+            }
+        });
+
+        setArrayBtn.addEventListener('click', () => {
+            const input = arrayInput.value.split(',').map(num => parseInt(num.trim()));
+            if (input.some(isNaN)) {
+                alert('Please enter valid numbers separated by commas');
+                return;
+            }
+            array = input;
+            resetSort();
+        });
+
+        function showCode(language) {
+            const codes = {
+                c: `
+#include <stdio.h>
+
+void swap(int *xp, int *yp) {
+    int temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+
+void selectionSort(int arr[], int n) {
+    int i, j, min_idx;
+    for (i = 0; i < n - 1; i++) {
+        min_idx = i;
+        for (j = i + 1; j < n; j++)
+            if (arr[j] < arr[min_idx])
+                min_idx = j;
+        swap(&arr[min_idx], &arr[i]);
+    }
+}
+
+int main() {
+    int arr[] = {64, 34, 25, 12, 22, 11, 90};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    selectionSort(arr, n);
+    printf("Sorted array: ");
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    return 0;
+}`,
+                cpp: `
+#include <iostream>
+#include <vector>
+
+void selectionSort(std::vector<int>& arr) {
+    int n = arr.size();
+    for (int i = 0; i < n - 1; i++) {
+        int min_idx = i;
+        for (int j = i + 1; j < n; j++)
+            if (arr[j] < arr[min_idx])
+                min_idx = j;
+        std::swap(arr[min_idx], arr[i]);
+    }
+}
+
+int main() {
+    std::vector<int> arr = {64, 34, 25, 12, 22, 11, 90};
+    selectionSort(arr);
+    std::cout << "Sorted array: ";
+    for (int num : arr)
+        std::cout << num << " ";
+    return 0;
+}`,
+                java: `
+import java.util.Arrays;
+
+public class SelectionSort {
+    public static void selectionSort(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            int min_idx = i;
+            for (int j = i + 1; j < n; j++)
+                if (arr[j] < arr[min_idx])
+                    min_idx = j;
+            int temp = arr[min_idx];
+            arr[min_idx] = arr[i];
+            arr[i] = temp;
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {64, 34, 25, 12, 22, 11, 90};
+        selectionSort(arr);
+        System.out.println("Sorted array: " + Arrays.toString(arr));
+    }
+}`,
+                python: `
+def selection_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        min_idx = i
+        for j in range(i + 1, n):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+
+arr = [64, 34, 25, 12, 22, 11, 90]
+selection_sort(arr)
+print("Sorted array:", arr)
+`
+            };
+
+            codeImplementation.textContent = codes[language];
+            currentLanguage.textContent = `Current Language: ${language.toUpperCase()}`;
+            
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase() === language) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function updatePerformanceExplanation() {
+            const n = array.length;
+            const expectedComparisons = n * (n - 1) / 2;
+            const expectedSwaps = n - 1;
+
+            performanceExplanation.innerHTML = `
+                <h3>Performance Analysis</h3>
+                <p>Array size: ${n}</p>
+                <p>Expected comparisons: ${expectedComparisons} (n * (n-1) / 2)</p>
+                <p>Actual comparisons: ${comparisons}</p>
+                <p>Expected swaps: ${expectedSwaps} (n - 1)</p>
+                <p>Actual swaps: ${swaps}</p>
+                <p>Time Complexity: O(n²) - The nested loops in Selection Sort lead to quadratic time complexity.</p>
+                <p>Space Complexity: O(1) - Selection Sort is an in-place sorting algorithm, using only a constant amount of extra memory.</p>
+            `;
+        }
+
+        function generateAIQuestion() {
+            const questions = [
+                {
+                    question: "How does the number of comparisons in Selection Sort relate to the array size?",
+                    options: [
+                        "It's always equal to the array size",
+                        "It's quadratic (n²) in relation to the array size",
+                        "It's logarithmic in relation to the array size",
+                        "It's linear in relation to the array size"
+                    ],
+                    correctAnswer: 1
+                },
+                {
+                    question: "Why is the space complexity of Selection Sort O(1)?",
+                    options: [
+                        "Because it always uses a fixed amount of extra memory",
+                        "Because it sorts the array in-place",
+                        "Because it only needs one additional variable for swapping",
+                        "All of the above"
+                    ],
+                    correctAnswer: 3
+                },
+                {
+                    question: "In what scenarios might Selection Sort be preferred over other sorting algorithms?",
+                    options: [
+                        "When dealing with very large datasets",
+                        "When memory space is extremely limited",
+                        "When sorting speed is the top priority",
+                        "When the input is already nearly sorted"
+                    ],
+                    correctAnswer: 1
+                },
+                {
+                    question: "How would the performance of Selection Sort change if the input array was already sorted?",
+                    options: [
+                        "It would perform much faster",
+                        "It would perform much slower",
+                        "Its performance would remain the same",
+                        "It would cause an error"
+                    ],
+                    correctAnswer: 2
+                },
+                {
+                    question: "What is a potential optimization for Selection Sort with partially sorted arrays?",
+                    options: [
+                        "Use a binary search to find the minimum element",
+                        "Skip already sorted elements at the beginning",
+                        "Reverse the direction of sorting for each pass",
+                        "There are no effective optimizations for partially sorted arrays"
+                    ],
+                    correctAnswer: 1
+                }
+            ];
+
+            currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+            aiQuestionElement.textContent = currentQuestion.question;
+            questionOptionsElement.innerHTML = '';
+            currentQuestion.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'question-option';
+                optionElement.textContent = option;
+                optionElement.onclick = () => selectOption(index);
+                questionOptionsElement.appendChild(optionElement);
+            });
+            submitAnswerBtn.style.display = 'block';
+            submitAnswerBtn.disabled = true;
+        }
+
+        function selectOption(index) {
+            document.querySelectorAll('.question-option').forEach((option, i) => {
+                option.classList.toggle('selected', i === index);
+            });
+            submitAnswerBtn.disabled = false;
+        }
+
+        submitAnswerBtn.addEventListener('click', () => {
+            const selectedOption = document.querySelector('.question-option.selected');
+            if (selectedOption) {
+                const selectedIndex = Array.from(selectedOption.parentNode.children).indexOf(selectedOption);
+                if (selectedIndex === currentQuestion.correctAnswer) {
+                    alert('Correct answer!');
+                } else {
+                    alert('Incorrect. Try again!');
+                }
+                generateAIQuestion();
+            }
+        });
+
+        readMoreBtn.addEventListener('click', () => {
+            conceptContent.classList.toggle('expanded');
+            readMoreBtn.textContent = conceptContent.classList.contains('expanded') ? 'Read Less' : 'Read More';
+        });
+
+        // Initialize
+        resetSort();
+        showCode('c');
+    </script>
+</body>
+</html>
