@@ -38,4 +38,5 @@ This project is an interactive Generative AI-powered tool designed to teach sort
 ### How to Use
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/sorting-ai-tool.git
+  git clone https://github.com/Starscream-745/Sorting_Visualizer.git
+
